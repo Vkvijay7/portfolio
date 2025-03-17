@@ -82,21 +82,39 @@ function isInViewport(element) {
   );
 }
 
-// Animate elements when they come into view
-function animateOnScroll() {
+// Fix for About page skill bars animation
+function animateSkillBars() {
   const skillBars = document.querySelectorAll('.skill-progress');
-  const fadeElements = document.querySelectorAll('.glass-card, .service-card, .project-card, .soft-skill-card');
   
   skillBars.forEach(bar => {
-    if (isInViewport(bar) && !bar.classList.contains('animated')) {
-      const width = bar.style.width;
+    // Store the original width value as a data attribute if not already set
+    if (!bar.hasAttribute('data-width')) {
+      const widthValue = bar.style.width;
+      bar.setAttribute('data-width', widthValue);
+      // Initially set width to 0
       bar.style.width = '0';
+    }
+    
+    // Check if the bar is in viewport
+    if (isInViewport(bar) && !bar.classList.contains('animated')) {
+      const width = bar.getAttribute('data-width');
+      // Animate to the original width
       setTimeout(() => {
+        bar.style.transition = 'width 1s ease-in-out';
         bar.style.width = width;
         bar.classList.add('animated');
-      }, 100);
+      }, 200);
     }
   });
+}
+
+// Animate elements when they come into view
+function animateOnScroll() {
+  // Call skill bars animation
+  animateSkillBars();
+  
+  // Animate other elements
+  const fadeElements = document.querySelectorAll('.glass-card, .service-card, .project-card, .soft-skill-card');
   
   fadeElements.forEach(element => {
     if (isInViewport(element) && !element.classList.contains('faded-in')) {
@@ -109,6 +127,12 @@ function animateOnScroll() {
     }
   });
 }
+
+// Initialize animations when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Run animation once when the page loads
+  animateOnScroll();
+});
 
 // Add scroll event listener for animations
 window.addEventListener('scroll', animateOnScroll);
